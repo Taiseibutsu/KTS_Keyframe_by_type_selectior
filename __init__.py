@@ -154,7 +154,7 @@ def tb_kts_panel(self, context):
         elif tbtool.keyframe_type == 'EXTREME':
             tb_kts_type_index = 3       
         elif tbtool.keyframe_type == 'JITTER':
-            tb_kts_type_index = 3                              
+            tb_kts_type_index = 4                              
         row.prop(tbtool, "keyframe_type",text="",icon=tbtool.keyframe_type_icon[tb_kts_type_index])       
         row.separator()         
         if context.space_data.ui_mode in ['DOPESHEET','ACTION']:
