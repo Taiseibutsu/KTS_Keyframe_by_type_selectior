@@ -16,4 +16,8 @@ Tools are defined to follow:
     * <img width="20" height="20" src="https://user-images.githubusercontent.com/84092569/157845563-89a96d8a-1900-473f-b2d1-2bc95b506800.png"> Active or Selected Collections
 
 
+**Knowing limitations**
+- selection needs to change to multiple bool selection to more usability.
+- need to add mask, shapekeys, cached and grease pencil ketframe option.
+
 
