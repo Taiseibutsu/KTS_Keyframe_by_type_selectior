@@ -1,9 +1,11 @@
 # KTS (Keyframe by type selector) (TB)
 **Add-on for Blender with operators to select keyframes by type 
 
+
 <img width="20" height="20" src="https://user-images.githubusercontent.com/84092569/157845746-ba556545-2483-4530-919c-0ac7aeb6773d.png"> Objects, <img width="20" height="20" src="https://user-images.githubusercontent.com/84092569/157845568-dedaf00f-d1f6-46f3-bd5c-f390cf0ac9f9.png"> Data-Blocks, <img width="20" height="20" src="https://user-images.githubusercontent.com/84092569/157845743-7a8bd16b-5e46-4e07-9ccd-9f343e3ed830.png"> Materials, <img width="20" height="20" src="https://user-images.githubusercontent.com/84092569/157846132-99dc7138-daa1-47d6-b352-2394fa9c357a.png"> Action names.**
 
-![image](https://user-images.githubusercontent.com/84092569/180628184-dee5c21b-17f8-4afc-8d01-40ba002d5c3b.png)
+![image](https://user-images.githubusercontent.com/84092569/180643443-b90e00d2-faf0-4d39-833a-5c2cea58a8b2.png)
+
 _____
 
 Tools are defined to follow:
