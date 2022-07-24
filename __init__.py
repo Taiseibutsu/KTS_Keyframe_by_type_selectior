@@ -33,7 +33,7 @@ class TB_KTS_Properties(bpy.types.PropertyGroup):
         name = "Enumerator/Dropdown",
         description = "Object that will rename",
         items= [('SELECTION', "Selection", "Select keyframes by type from active selection",  'RESTRICT_SELECT_OFF', 0),
-                ('COLLECTION',"Colection", "Select keyframes by type from active colection",  'OUTLINER_COLLECTION', 1),
+                ('COLLECTION',"Collection", "Select keyframes by type from active colection",  'OUTLINER_COLLECTION', 1),
                 ('SCENE',"Scene", "Select keyframes by type from scene",'SCENE_DATA', 2),
                 ('ALL',"All", "Select all keyframes by type",'BLENDER', 3)
         ]
