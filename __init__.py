@@ -54,6 +54,7 @@ class TB_KTS_Properties(bpy.types.PropertyGroup):
     select_only_active : bpy.props.BoolProperty(default = False, description = "Select Keyframes from Active Object Only")
     select_from_dopesheet_context : bpy.props.BoolProperty(default = True, description = "Select Keyframes using context from dopesheet")
 
+    affect_current_scene_keyframes : bpy.props.BoolProperty(default = True, description = "Select Keyframes from scene")
 def tb_kts_get_range():
     tbtool = bpy.context.scene.tb_kts_prop
     if tbtool.keyframe_range == 'SELECTION':
@@ -78,6 +79,7 @@ def tb_kts_set_selection(ob):
                 for k in f.keyframe_points:
                     if k.type == tbtool.keyframe_type:
                         k.select_control_point = True
+
                 
                 
 def tb_kts_select_keyframes_by_type(context):
@@ -97,6 +99,15 @@ def tb_kts_select_keyframes_by_type(context):
                         
                 else:
                     tb_kts_set_selection(ob)
+    if tbtool.affect_current_scene_keyframes:
+        scn = bpy.context.scene
+        if scn.animation_data:
+            if scn.animation_data.action:
+                fcurves = scn.animation_data.action.fcurves
+                for f in fcurves:
+                    for k in f.keyframe_points:
+                        if k.type == tbtool.keyframe_type:
+                            k.select_control_point = True                    
 
     if context.space_data.ui_mode == 'SHAPEKEY':
         sh =  bpy.context.active_object.data.shape_keys
@@ -159,6 +170,7 @@ def tb_kts_panel(self, context):
         row.separator()         
         if context.space_data.ui_mode in ['DOPESHEET','ACTION']:
             row.prop(tbtool, "keyframe_range",text="",icon=tbtool.keyframe_context_icon[tb_kts_context_index])
+            row.prop(tbtool,"affect_current_scene_keyframes",text="",icon='SCENE_DATA')
         row = box.row(align=True)
         row.operator("tb_ops.kts_keyframe_selector",text="Select Keyframes")
 
