@@ -38,12 +38,19 @@ class TB_KTS_Properties(bpy.types.PropertyGroup):
                 ('ALL',"All", "Select all keyframes by type",'BLENDER', 3)
         ]
     )
+    keyframe_type_KEYFRAME : bpy.props.BoolProperty(default = True, description = "Select Keyframe default Type")
+    keyframe_type_BREAKDOWN : bpy.props.BoolProperty(default = True, description = "Select Keyframe breakdown Type")
+    keyframe_type_MOVING_HOLD : bpy.props.BoolProperty(default = True, description = "Select Keyframe moving hold Type")
+    keyframe_type_EXTREME : bpy.props.BoolProperty(default = True, description = "Select Keyframe extreme Type")
+    keyframe_type_JITTER : bpy.props.BoolProperty(default = True, description = "Select Keyframe jitter Type")
+
     keyframe_type_icon = ['KEYTYPE_KEYFRAME_VEC','KEYTYPE_BREAKDOWN_VEC','KEYTYPE_MOVING_HOLD_VEC','KEYTYPE_EXTREME_VEC','KEYTYPE_JITTER_VEC']
     keyframe_type_text = ["Normal","Breakdown","Moving_hold","Extreme","Jitter"]
     
     keyframe_context_icon = ['RESTRICT_SELECT_OFF','OUTLINER_COLLECTION','SCENE_DATA','BLENDER']
     keyframe_context_text = ["Selection","Collection","Scene","All"]
     
+    keyframe_type_context : bpy.props.BoolProperty(default = True, description = "Way to handle selection")
     
     select_from_scene : bpy.props.PointerProperty(type=bpy.types.Scene)
     select_from_active_scene : bpy.props.BoolProperty(default = True, description = "Select Keyframes from Active Scene")
@@ -61,7 +68,16 @@ def tb_kts_get_range():
         temp_keyframe_range = bpy.context.selected_objects
         return(temp_keyframe_range)
     elif tbtool.keyframe_range == 'COLLECTION':
-        temp_keyframe_range = bpy.context.collection.objects 
+        if tbtool.select_from_active_collection:
+            if bpy.context.collection:
+                if bpy.context.collection.objects:
+                    temp_keyframe_range = bpy.context.collection.objects
+                else:
+                    temp_keyframe_range = 'NONE'
+            else:
+                temp_keyframe_range = 'NONE'
+        else:
+            temp_keyframe_range = tbtool.select_from_collection.objects
         return(temp_keyframe_range)
     elif tbtool.keyframe_range == 'SCENE':
         temp_keyframe_range = bpy.context.scene.objects
@@ -75,10 +91,8 @@ def tb_kts_set_selection(ob):
     if ob.animation_data:
         if ob.animation_data.action:
             fcurves = ob.animation_data.action.fcurves
-            for f in fcurves:
-                for k in f.keyframe_points:
-                    if k.type == tbtool.keyframe_type:
-                        k.select_control_point = True
+            select_keyframes(fcurves)
+
 
                 
                 
@@ -87,27 +101,25 @@ def tb_kts_select_keyframes_by_type(context):
 
     if context.space_data.ui_mode in ['DOPESHEET','ACTION']:
         act_keyframe_range = tb_kts_get_range()
-        for ob in act_keyframe_range:
-            if tbtool.select_from_dopesheet_context:
-                if bpy.context.space_data.dopesheet.show_only_selected == True:
-                    if ob.select_get() == True:
-                        if bpy.context.space_data.dopesheet.show_hidden == True:
-                            if ob.hide_viewport != False:
+        if act_keyframe_range != 'NONE':
+            for ob in act_keyframe_range:
+                if tbtool.select_from_dopesheet_context:
+                    if bpy.context.space_data.dopesheet.show_only_selected == True:
+                        if ob.select_get() == True:
+                            if bpy.context.space_data.dopesheet.show_hidden == True:
+                                if ob.hide_viewport != False:
+                                    tb_kts_set_selection(ob)
+                            else:
                                 tb_kts_set_selection(ob)
-                        else:
-                            tb_kts_set_selection(ob)
-                        
-                else:
-                    tb_kts_set_selection(ob)
+                            
+                    else:
+                        tb_kts_set_selection(ob)
     if tbtool.affect_current_scene_keyframes:
         scn = bpy.context.scene
         if scn.animation_data:
             if scn.animation_data.action:
                 fcurves = scn.animation_data.action.fcurves
-                for f in fcurves:
-                    for k in f.keyframe_points:
-                        if k.type == tbtool.keyframe_type:
-                            k.select_control_point = True                    
+                select_keyframes(fcurves)                 
 
     if context.space_data.ui_mode == 'SHAPEKEY':
         sh =  bpy.context.active_object.data.shape_keys
@@ -115,22 +127,39 @@ def tb_kts_select_keyframes_by_type(context):
             if sh.animation_data:
                 if sh.animation_data.action:
                     fcurves = sh.fcurves
-                    for f in fcurves:
-                        for k in f.keyframe_points:
-                            if k.type == tbtool.keyframe_type:
-                                k.select_control_point = True
+                    select_keyframes(fcurves)
 
     if context.space_data.ui_mode == 'GPENCIL':
         for gp in bpy.data.grease_pencils:
             if gp.animation_data:
                 if gp.animation_data.action:
                     fcurves = gp.animation_data.action.fcurves
-                    for f in fcurves:
-                        for k in f.keyframe_points:
-                            if k.type == tbtool.keyframe_type:
-                                k.select_control_point = True
+                    select_keyframes(fcurves)
     #PLANED  
      #if context.space_data.ui_mode == 'MASK':        
+def select_keyframes(fcurves):
+    tbtool = bpy.context.scene.tb_kts_prop
+    for f in fcurves:
+        for k in f.keyframe_points:    
+            if tbtool.keyframe_type_context:
+                if tbtool.keyframe_type_KEYFRAME:
+                    if k.type == 'KEYFRAME':
+                        k.select_control_point = True    
+                if tbtool.keyframe_type_BREAKDOWN:
+                    if k.type == 'BREAKDOWN':                    
+                        k.select_control_point = True        
+                if tbtool.keyframe_type_MOVING_HOLD:
+                    if k.type == 'MOVING_HOLD':                    
+                        k.select_control_point = True        
+                if tbtool.keyframe_type_EXTREME:
+                    if k.type == 'EXTREME':                                        
+                        k.select_control_point = True
+                if tbtool.keyframe_type_JITTER:
+                    if k.type == 'JITTER':                                        
+                        k.select_control_point = True
+            else:
+                if k.type == tbtool.keyframe_type:
+                    k.select_control_point = True
 
 class TB_KTS_SELECTOR(bpy.types.Operator):
     bl_idname = "tb_ops.kts_keyframe_selector"
@@ -165,11 +194,26 @@ def tb_kts_panel(self, context):
         elif tbtool.keyframe_type == 'EXTREME':
             tb_kts_type_index = 3       
         elif tbtool.keyframe_type == 'JITTER':
-            tb_kts_type_index = 4                              
-        row.prop(tbtool, "keyframe_type",text="",icon=tbtool.keyframe_type_icon[tb_kts_type_index])       
+            tb_kts_type_index = 4                           
+        if tbtool.keyframe_type_context:
+            row.prop(tbtool, "keyframe_type_KEYFRAME",text="",icon=tbtool.keyframe_type_icon[0])
+            row.prop(tbtool, "keyframe_type_BREAKDOWN",text="",icon=tbtool.keyframe_type_icon[1])
+            row.prop(tbtool, "keyframe_type_MOVING_HOLD",text="",icon=tbtool.keyframe_type_icon[2])
+            row.prop(tbtool, "keyframe_type_EXTREME",text="",icon=tbtool.keyframe_type_icon[3])
+            row.prop(tbtool, "keyframe_type_JITTER",text="",icon=tbtool.keyframe_type_icon[4])  
+        else:
+            row.prop(tbtool, "keyframe_type",text="",icon=tbtool.keyframe_type_icon[tb_kts_type_index])      
         row.separator()         
         if context.space_data.ui_mode in ['DOPESHEET','ACTION']:
-            row.prop(tbtool, "keyframe_range",text="",icon=tbtool.keyframe_context_icon[tb_kts_context_index])
+            if tbtool.keyframe_range == 'COLLECTION':
+                if tbtool.select_from_active_collection:
+                    row.prop(tbtool,"select_from_active_collection",text="Active Collection",icon='PIVOT_ACTIVE')
+                else:
+                    row.prop(tbtool,"select_from_active_collection",text="",icon='PIVOT_ACTIVE')                    
+                    row.prop(tbtool,"select_from_collection",text="")
+                row.prop(tbtool, "keyframe_range",text="",icon=tbtool.keyframe_context_icon[tb_kts_context_index])
+            else:
+                row.prop(tbtool, "keyframe_range",text="",icon=tbtool.keyframe_context_icon[tb_kts_context_index])
             row.prop(tbtool,"affect_current_scene_keyframes",text="",icon='SCENE_DATA')
         row = box.row(align=True)
         row.operator("tb_ops.kts_keyframe_selector",text="Select Keyframes")
@@ -189,6 +233,7 @@ class TB_PT_KBS(bpy.types.Panel):
         layout.label(icon='KEYFRAME_HLT')
 
         layout.label(text="KTS Keyframe by type selector")
+        layout.prop(tbtool,"keyframe_type_context",text="",icon='ARROW_LEFTRIGHT')
     def draw (self,context):
         tb_kts_panel(self, context)
 
